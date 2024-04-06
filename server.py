@@ -9,7 +9,8 @@ logging.basicConfig(level=logging.INFO)
 cities = {
     'москва': ['1533899/61bd67204d136c9996e5'],
     'нью-йорк': ['1030494/6c98a166da2daf25c0ef'],
-    'париж': ['1030494/0d78799159b6a5ed2e6e']
+    'париж': ['1030494/0d78799159b6a5ed2e6e'],
+    'помощь': ['1030494/6103f8ad20b3c373a4e1']
 }
 
 sessionStorage = {}
@@ -89,7 +90,10 @@ def handle_dialog(res, req):
                 res['response']['text'] = 'Ну и ладно!'
                 res['end_session'] = True
             elif 'помощь' in req['request']['original_utterance'].lower():
-                res['response']['text'] = 'Текст помощи...'
+                res['response']['text'] = 'На этой картинке представлены правила игры'
+                res['response']['card'] = {}
+                res['response']['card']['type'] = 'BigImage'
+                res['response']['card']['image_id'] = cities['помощь'][0]
             else:
                 res['response']['text'] = 'Не поняла ответа! Так да или нет?'
                 res['response']['buttons'] = [
@@ -107,7 +111,10 @@ def handle_dialog(res, req):
                     }
                 ]
         elif 'помощь' in req['request']['original_utterance'].lower():
-            res['response']['text'] = 'Текст помощи...'
+            res['response']['text'] = 'На этой картинке представлены правила игры'
+            res['response']['card'] = {}
+            res['response']['card']['type'] = 'BigImage'
+            res['response']['card']['image_id'] = cities['помощь'][0]
         else:
             play_game(res, req)
 
