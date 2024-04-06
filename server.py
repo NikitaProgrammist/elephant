@@ -59,6 +59,10 @@ def handle_dialog(res, req):
                 {
                     'title': 'Нет',
                     'hide': True
+                },
+                {
+                    'title': 'Помощь',
+                    'hide': True
                 }
             ]
     else:
@@ -84,6 +88,8 @@ def handle_dialog(res, req):
             elif 'нет' in req['request']['nlu']['tokens']:
                 res['response']['text'] = 'Ну и ладно!'
                 res['end_session'] = True
+            elif 'помощь' in req['request']['original_utterance'].lower():
+                res['response']['text'] = 'Текст помощи...'
             else:
                 res['response']['text'] = 'Не поняла ответа! Так да или нет?'
                 res['response']['buttons'] = [
@@ -94,8 +100,14 @@ def handle_dialog(res, req):
                     {
                         'title': 'Нет',
                         'hide': True
+                    },
+                    {
+                        'title': 'Помощь',
+                        'hide': True
                     }
                 ]
+        elif 'помощь' in req['request']['original_utterance'].lower():
+            res['response']['text'] = 'Текст помощи...'
         else:
             play_game(res, req)
 
@@ -115,8 +127,14 @@ def play_game(res, req):
         res['response']['card'] = {}
         res['response']['card']['type'] = 'BigImage'
         res['response']['card']['title'] = 'Что это за город?'
-        res['response']['card']['image_id'] = cities[city][attempt - 1]
+        res['response']['card']['image_id'] = cities[city][0]
         res['response']['text'] = 'Тогда сыграем!'
+        res['response']['buttons'] = [
+            {
+                'title': 'Помощь',
+                'hide': True
+            }
+        ]
     else:
         # сюда попадаем, если попытка отгадать не первая
         city = sessionStorage[user_id]['city']
@@ -127,6 +145,20 @@ def play_game(res, req):
             res['response']['text'] = 'Правильно! Сыграем ещё?'
             sessionStorage[user_id]['guessed_cities'].append(city)
             sessionStorage[user_id]['game_started'] = False
+            res['response']['buttons'] = [
+                {
+                    'title': 'Да',
+                    'hide': True
+                },
+                {
+                    'title': 'Нет',
+                    'hide': True
+                },
+                {
+                    'title': 'Помощь',
+                    'hide': True
+                }
+            ]
             return
         else:
             # если нет
@@ -138,14 +170,34 @@ def play_game(res, req):
                 res['response']['text'] = f'Вы пытались. Это {city.title()}. Сыграем ещё?'
                 sessionStorage[user_id]['game_started'] = False
                 sessionStorage[user_id]['guessed_cities'].append(city)
+                res['response']['buttons'] = [
+                    {
+                        'title': 'Да',
+                        'hide': True
+                    },
+                    {
+                        'title': 'Нет',
+                        'hide': True
+                    },
+                    {
+                        'title': 'Помощь',
+                        'hide': True
+                    }
+                ]
                 return
             else:
                 # иначе показываем следующую картинку
                 res['response']['card'] = {}
                 res['response']['card']['type'] = 'BigImage'
                 res['response']['card']['title'] = 'Неправильно. Вот тебе дополнительное фото'
-                res['response']['card']['image_id'] = cities[city][attempt - 1]
+                res['response']['card']['image_id'] = cities[city][0]
                 res['response']['text'] = 'А вот и не угадал!'
+                res['response']['buttons'] = [
+                    {
+                        'title': 'Помощь',
+                        'hide': True
+                    }
+                ]
     # увеличиваем номер попытки доля следующего шага
     sessionStorage[user_id]['attempt'] += 1
 
